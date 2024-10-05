@@ -1,41 +1,43 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { CiText } from 'react-icons/ci';
-import { DeviceFrameset } from 'react-device-frameset';
-import 'react-device-frameset/styles/marvel-devices.min.css';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
-const elements = [
-  {
-    id: '1',
-  },
-  {
-    id: '2',
-  },
-  {
-    id: '3',
-  },
-  {
-    id: '4',
-  },
-  {
-    id: '5',
-  },
-  {
-    id: '6',
-  },
-  {
-    id: '7',
-  },
-  {
-    id: '8',
-  },
+interface Element {
+  id: string;
+}
+
+const initialElements: Element[] = [
+  { id: '1' },
+  { id: '2' },
+  { id: '3' },
+  { id: '4' },
+  { id: '5' },
+  { id: '6' },
+  { id: '7' },
+  { id: '8' },
 ];
 
-const Editor = () => {
+const Editor: React.FC = () => {
+  const [droppedElements, setDroppedElements] = useState<Element[]>([]);
+
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
+
+    if (result.source.droppableId === 'items') {
+      // Move element from sidebar to device frame with a new unique ID
+      const newElement: Element = {
+        id: `${result.draggableId}-${Date.now()}`,
+      };
+      setDroppedElements((prev) => [...prev, newElement]);
+    } else {
+      // Reorder dropped elements
+      const reorderedElements = Array.from(droppedElements);
+      const [movedElement] = reorderedElements.splice(result.source.index, 1);
+      reorderedElements.splice(result.destination.index, 0, movedElement);
+      setDroppedElements(reorderedElements);
+    }
   };
 
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
@@ -68,43 +70,28 @@ const Editor = () => {
                     ref={provided.innerRef}
                     className='grid grid-cols-2 gap-4 mt-2 text-white/80'
                   >
-                    {elements.map((element, index) => (
+                    {initialElements.map((element, index) => (
                       <Draggable
                         key={element.id}
                         draggableId={element.id}
                         index={index}
                       >
                         {(provided, snapshot) => (
-                          <>
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )}
-                              className='!p-0 transition-none'
-                            >
-                              <div
-                                key={element.id}
-                                className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'
-                              >
-                                <CiText size={30} />
-                                <p className='text-xs'>Heading {index} </p>
-                              </div>
-                            </div>
-
-                            {snapshot.isDragging && (
-                              <div
-                                key={element.id}
-                                className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'
-                              >
-                                <CiText size={30} />
-                                <p className='text-xs'>Heading</p>
-                              </div>
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(
+                              snapshot.isDragging,
+                              provided.draggableProps.style
                             )}
-                          </>
+                            className='!p-0 transition-none'
+                          >
+                            <div className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
+                              <CiText size={30} />
+                              <p className='text-xs'>Heading {index}</p>
+                            </div>
+                          </div>
                         )}
                       </Draggable>
                     ))}
@@ -115,25 +102,51 @@ const Editor = () => {
             </div>
           </aside>
 
-          <div className='flex-1 p-4 flex items-center justify-center text-black'>
-            <DeviceFrameset device='iPhone X' color='gold' zoom={0.75}>
-              <div className='h-[30px]'></div>
-              <div className='h-[30px]'>Hello world</div>
-              <Droppable droppableId='elements' isDropDisabled={true}>
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className={'Kiosk h-[300px]'}
-                  >
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DeviceFrameset>
+          <div className='flex-1 p-4 flex items-center justify-center text-black overflow-hidden'>
+            {/* <DeviceFrameset device='iPhone X' color='gold' zoom={0.75}> */}
+            <div className='h-full bg-white aspect-[9/19] iphone-case'>
+              <div className='flex flex-col h-full overflow-hidden bg-white rounded-3xl'>
+                <div className='h-[34px] shrink-0'></div>
+                <Droppable droppableId='elements'>
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className='flex-1 Kiosk h-full overflow-x-hidden overflow-y-auto'
+                    >
+                      {droppedElements.map((element, index) => (
+                        <Draggable
+                          key={element.id}
+                          draggableId={element.id}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                false,
+                                provided.draggableProps.style
+                              )}
+                              className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'
+                            >
+                              <CiText size={30} />
+                              <p className='text-xs'>Heading {index + 1}</p>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            </div>
+            {/* </DeviceFrameset> */}
           </div>
 
-          <aside className='p-4 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
+          <aside className='shrink-0 p-4 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
             Right sidebar
           </aside>
         </main>
