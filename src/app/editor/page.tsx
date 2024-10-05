@@ -1,5 +1,7 @@
 import React from 'react';
 import { CiText } from 'react-icons/ci';
+import { DeviceFrameset } from 'react-device-frameset';
+import 'react-device-frameset/styles/marvel-devices.min.css';
 
 const elements = [
   {
@@ -67,7 +69,12 @@ const Editor = () => {
           </div>
         </aside>
 
-        <div className='flex-1 p-4'>Editor</div>
+        <div className='flex-1 p-4 flex items-center justify-center text-black'>
+          <DeviceFrameset device='iPhone X' color='gold' zoom={0.75}>
+            <div className='h-[30px]'></div>
+            <div className='h-[30px]'>Hello world</div>
+          </DeviceFrameset>
+        </div>
 
         <aside className='p-4 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
           Right sidebar
