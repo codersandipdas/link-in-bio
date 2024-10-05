@@ -21,8 +21,11 @@ const initialElements: Element[] = [
 
 const Editor: React.FC = () => {
   const [droppedElements, setDroppedElements] = useState<Element[]>([]);
+  const [placeholderProps, setPlaceholderProps] = useState<any>({});
 
   const onDragEnd = (result: any) => {
+    setPlaceholderProps({});
+
     if (!result.destination) return;
 
     if (result.source.droppableId === 'items') {
@@ -40,6 +43,47 @@ const Editor: React.FC = () => {
     }
   };
 
+  const queryAttr = 'data-rfd-drag-handle-draggable-id';
+  const onDragUpdate = (update: any) => {
+    console.log('drag uodate');
+    if (!update.destination) {
+      return;
+    }
+    const draggableId = update.draggableId;
+    const initialIndex = update.source.index;
+    const destinationIndex = update.destination.index;
+
+    const domQuery = `[${queryAttr}='${draggableId}']`;
+    const draggedDOM: any = document.querySelector(domQuery);
+
+    if (!draggedDOM) {
+      return;
+    }
+    const { clientHeight, clientWidth } = draggedDOM;
+
+    const arr = [...draggedDOM.parentNode.children];
+    if (initialIndex < destinationIndex) {
+      arr.splice(initialIndex, 1);
+    }
+
+    const clientY =
+      parseFloat(window.getComputedStyle(draggedDOM.parentNode).paddingTop) +
+      arr.slice(0, destinationIndex).reduce((total, curr) => {
+        const style = curr.currentStyle || window.getComputedStyle(curr);
+        const marginBottom = parseFloat(style.marginBottom);
+        return total + curr.clientHeight + marginBottom;
+      }, 0);
+
+    setPlaceholderProps({
+      clientHeight,
+      clientWidth,
+      clientY,
+      clientX: parseFloat(
+        window.getComputedStyle(draggedDOM.parentNode).paddingLeft
+      ),
+    });
+  };
+
   const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
     userSelect: 'none',
     padding: '1rem',
@@ -48,7 +92,7 @@ const Editor: React.FC = () => {
   });
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
       <div className='h-screen flex flex-col overflow-hidden'>
         <header className='shrink-0 h-[60px] p-4 border-b border-slate-800'>
           Header
@@ -87,7 +131,7 @@ const Editor: React.FC = () => {
                             )}
                             className='!p-0 transition-none'
                           >
-                            <div className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
+                            <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
                               <CiText size={30} />
                               <p className='text-xs'>Heading {index}</p>
                             </div>
@@ -103,7 +147,6 @@ const Editor: React.FC = () => {
           </aside>
 
           <div className='flex-1 p-4 flex items-center justify-center text-black overflow-hidden'>
-            {/* <DeviceFrameset device='iPhone X' color='gold' zoom={0.75}> */}
             <div className='h-full bg-white aspect-[9/19] iphone-case'>
               <div className='flex flex-col h-full overflow-hidden bg-white rounded-3xl'>
                 <div className='h-[34px] shrink-0'></div>
@@ -112,7 +155,7 @@ const Editor: React.FC = () => {
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      className='flex-1 Kiosk h-full overflow-x-hidden overflow-y-auto'
+                      className='flex-1 Kiosk h-full overflow-x-hidden overflow-y-auto relative'
                     >
                       {droppedElements.map((element, index) => (
                         <Draggable
@@ -129,21 +172,31 @@ const Editor: React.FC = () => {
                                 false,
                                 provided.draggableProps.style
                               )}
-                              className='p-4 rounded border border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'
+                              className='p-4 border-white/20 flex flex-col items-center gap-2 transition-all hover:border border-primary'
                             >
                               <CiText size={30} />
-                              <p className='text-xs'>Heading {index + 1}</p>
+                              <p className='text-xs'>Heading {element.id}</p>
                             </div>
                           )}
                         </Draggable>
                       ))}
                       {provided.placeholder}
+                      <div
+                        id='custom-placeholder'
+                        style={{
+                          position: 'absolute',
+                          top: placeholderProps.clientY,
+                          left: 0,
+                          height: placeholderProps.clientHeight,
+                          background: '#ff000010',
+                          width: '100%',
+                        }}
+                      />
                     </div>
                   )}
                 </Droppable>
               </div>
             </div>
-            {/* </DeviceFrameset> */}
           </div>
 
           <aside className='shrink-0 p-4 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
