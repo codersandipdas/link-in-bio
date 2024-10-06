@@ -36,11 +36,12 @@ const Editor: React.FC = () => {
       const newElement: Element = {
         id: `${result.draggableId}-${Date.now()}`,
       };
-      setDroppedElements((prev) => [...prev, newElement]);
+      const updatedElements = [...droppedElements];
+      updatedElements.splice(result.destination.index, 0, newElement);
+      setDroppedElements(updatedElements);
       setSelectedElementId(newElement.id);
     } else {
-      // Reorder dropped elements
-      const reorderedElements = Array.from(droppedElements);
+      const reorderedElements = [...droppedElements];
       const [movedElement] = reorderedElements.splice(result.source.index, 1);
       reorderedElements.splice(result.destination.index, 0, movedElement);
       setDroppedElements(reorderedElements);
@@ -127,21 +128,29 @@ const Editor: React.FC = () => {
                         index={index}
                       >
                         {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={getItemStyle(
-                              snapshot.isDragging,
-                              provided.draggableProps.style
-                            )}
-                            className='!p-0 transition-none'
-                          >
-                            <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
-                              <CiText size={30} />
-                              <p className='text-xs'>Heading {index}</p>
+                          <>
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}
+                              className='!p-0'
+                            >
+                              <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
+                                <CiText size={30} />
+                                <p className='text-xs'>Heading {index}</p>
+                              </div>
                             </div>
-                          </div>
+                            {snapshot.isDragging && (
+                              <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 !transform-none'>
+                                <CiText size={30} />
+                                <p className='text-xs'>Heading {index}</p>
+                              </div>
+                            )}
+                          </>
                         )}
                       </Draggable>
                     ))}
@@ -155,7 +164,7 @@ const Editor: React.FC = () => {
           <div className='flex-1 p-4 flex items-center justify-center text-black overflow-hidden'>
             <div className='h-full bg-white aspect-[9/19] iphone-case'>
               <div className='flex flex-col h-full overflow-hidden bg-white rounded-3xl'>
-                <div className='h-[34px] shrink-0'></div>
+                <div className='h-[30px] shrink-0'></div>
                 <Droppable droppableId='elements'>
                   {(provided) => (
                     <div
@@ -211,7 +220,7 @@ const Editor: React.FC = () => {
                           top: placeholderProps.clientY,
                           left: 0,
                           height: placeholderProps.clientHeight,
-                          background: '#F2542D10',
+                          background: '#F2542D30',
                           width: '100%',
                         }}
                       />
