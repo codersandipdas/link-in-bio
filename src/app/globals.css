@@ -21,3 +21,29 @@ html {
     @apply text-4xl md:text-6xl text-primary font-bold;
   }
 }
+
+.iphone-case {
+  --border-radius-outer: 2rem;
+  --outer-padding: 0.5rem;
+  --case-color: hsl(0, 0%, 0%);
+  --border-radius-inner: calc(
+    var(--border-radius-outer) - var(--outer-padding)
+  );
+  box-shadow: 0px 0px 0px 2px white;
+  background-color: var(--case-color);
+  border-radius: var(--border-radius-outer);
+  padding: var(--outer-padding);
+  position: relative;
+  margin-inline: auto;
+}
+.iphone-case:before {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 1.3rem;
+  background-color: var(--case-color);
+  width: 22%;
+  border-radius: 25px;
+}
