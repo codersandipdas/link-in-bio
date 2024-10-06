@@ -4,20 +4,25 @@ import React, { useState } from 'react';
 import { CiText } from 'react-icons/ci';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import DragHandle from '@/components/dragHandle/DragHandle';
+import { TbSocial } from 'react-icons/tb';
+import { PiCursorClick } from 'react-icons/pi';
+import { IoImageOutline } from 'react-icons/io5';
+import { BsTextLeft } from 'react-icons/bs';
+import { RxVideo } from 'react-icons/rx';
 
 interface Element {
   id: string;
+  title: string;
+  icon: React.ReactElement;
 }
 
 const initialElements: Element[] = [
-  { id: '1' },
-  { id: '2' },
-  { id: '3' },
-  { id: '4' },
-  { id: '5' },
-  { id: '6' },
-  { id: '7' },
-  { id: '8' },
+  { id: '1', title: 'Heading', icon: <CiText /> },
+  { id: '2', title: 'Socials', icon: <TbSocial /> },
+  { id: '3', title: 'Button', icon: <PiCursorClick /> },
+  { id: '4', title: 'Image', icon: <IoImageOutline /> },
+  { id: '5', title: 'Text Editor', icon: <BsTextLeft /> },
+  { id: '6', title: 'Video', icon: <RxVideo /> },
 ];
 
 const Editor: React.FC = () => {
@@ -33,7 +38,7 @@ const Editor: React.FC = () => {
     if (!result.destination) return;
 
     if (result.source.droppableId === 'items') {
-      const newElement: Element = {
+      const newElement: any = {
         id: `${result.draggableId}-${Date.now()}`,
       };
       const updatedElements = [...droppedElements];
@@ -140,14 +145,14 @@ const Editor: React.FC = () => {
                               className='!p-0'
                             >
                               <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 transition-all'>
-                                <CiText size={30} />
-                                <p className='text-xs'>Heading {index}</p>
+                                <span className='text-2xl'>{element.icon}</span>
+                                <p className='text-xs'>{element.title}</p>
                               </div>
                             </div>
                             {snapshot.isDragging && (
                               <div className='p-4 rounded border bg-[#1f2124] border-white/20 flex flex-col items-center gap-2 hover:bg-white/10 !transform-none'>
-                                <CiText size={30} />
-                                <p className='text-xs'>Heading {index}</p>
+                                <span className='text-2xl'>{element.icon}</span>
+                                <p className='text-xs'>{element.title}</p>
                               </div>
                             )}
                           </>
