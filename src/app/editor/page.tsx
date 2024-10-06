@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CiText } from 'react-icons/ci';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import DragHandle from '@/components/dragHandle/DragHandle';
 
 interface Element {
   id: string;
@@ -22,18 +23,21 @@ const initialElements: Element[] = [
 const Editor: React.FC = () => {
   const [droppedElements, setDroppedElements] = useState<Element[]>([]);
   const [placeholderProps, setPlaceholderProps] = useState<any>({});
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [selectedElementId, setSelectedElementId] = useState<string>('');
 
   const onDragEnd = (result: any) => {
     setPlaceholderProps({});
+    setIsDragging(false);
 
     if (!result.destination) return;
 
     if (result.source.droppableId === 'items') {
-      // Move element from sidebar to device frame with a new unique ID
       const newElement: Element = {
         id: `${result.draggableId}-${Date.now()}`,
       };
       setDroppedElements((prev) => [...prev, newElement]);
+      setSelectedElementId(newElement.id);
     } else {
       // Reorder dropped elements
       const reorderedElements = Array.from(droppedElements);
@@ -43,9 +47,11 @@ const Editor: React.FC = () => {
     }
   };
 
-  const queryAttr = 'data-rfd-drag-handle-draggable-id';
+  const queryAttr = 'data-rfd-draggable-id';
   const onDragUpdate = (update: any) => {
-    console.log('drag uodate');
+    setSelectedElementId(update.draggableId);
+    setIsDragging(true);
+
     if (!update.destination) {
       return;
     }
@@ -167,15 +173,32 @@ const Editor: React.FC = () => {
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
-                              {...provided.dragHandleProps}
+                              //   {...provided.dragHandleProps}
                               style={getItemStyle(
                                 false,
                                 provided.draggableProps.style
                               )}
-                              className='p-4 border-white/20 flex flex-col items-center gap-2 transition-all hover:border border-primary'
+                              className='!p-0'
                             >
-                              <CiText size={30} />
-                              <p className='text-xs'>Heading {element.id}</p>
+                              <DragHandle
+                                id={element.id}
+                                dragHandleProps={provided.dragHandleProps}
+                                selectedElementId={selectedElementId}
+                                isDragging={isDragging}
+                                onSelect={(elementId) =>
+                                  setSelectedElementId(elementId)
+                                }
+                                onDelete={(elementId) =>
+                                  console.log('deleted elementId', elementId)
+                                }
+                              >
+                                <div className='p-4 flex flex-col items-center gap-2'>
+                                  <CiText size={30} />
+                                  <p className='text-xs'>
+                                    Heading {element.id}
+                                  </p>
+                                </div>
+                              </DragHandle>
                             </div>
                           )}
                         </Draggable>
@@ -188,7 +211,7 @@ const Editor: React.FC = () => {
                           top: placeholderProps.clientY,
                           left: 0,
                           height: placeholderProps.clientHeight,
-                          background: '#ff000010',
+                          background: '#F2542D10',
                           width: '100%',
                         }}
                       />
