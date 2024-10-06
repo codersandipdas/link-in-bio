@@ -1,32 +1,80 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiText } from 'react-icons/ci';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import DragHandle from '@/components/dragHandle/DragHandle';
+import { v4 as uuid } from 'uuid';
 import { TbSocial } from 'react-icons/tb';
 import { PiCursorClick } from 'react-icons/pi';
 import { IoImageOutline } from 'react-icons/io5';
 import { BsTextLeft } from 'react-icons/bs';
 import { RxVideo } from 'react-icons/rx';
+import { DropedElement } from '@/utils/types';
+import OutputElement from '@/components/outputElement/OutputElement';
 
 interface Element {
   id: string;
   title: string;
   icon: React.ReactElement;
+  defaultData?: any;
 }
 
 const initialElements: Element[] = [
-  { id: '1', title: 'Heading', icon: <CiText /> },
-  { id: '2', title: 'Socials', icon: <TbSocial /> },
-  { id: '3', title: 'Button', icon: <PiCursorClick /> },
-  { id: '4', title: 'Image', icon: <IoImageOutline /> },
-  { id: '5', title: 'Text Editor', icon: <BsTextLeft /> },
-  { id: '6', title: 'Video', icon: <RxVideo /> },
+  {
+    id: 'heading',
+    title: 'Heading',
+    icon: <CiText />,
+    defaultData: {
+      value: 'Enter your heading here Enter your heading here',
+      style: {},
+      classes: 'text-xl',
+      sectionClasses: '',
+    },
+  },
+  {
+    id: 'socials',
+    title: 'Socials',
+    icon: <TbSocial />,
+    defaultData: {
+      value: [],
+      style: {},
+      classes: 'text-xl',
+      sectionClasses: 'px-3',
+    },
+  },
+  {
+    id: 'button',
+    title: 'Button',
+    icon: <PiCursorClick />,
+    defaultData: {
+      value: 'Button Text',
+      style: {},
+      classes: 'text-sm bg-primary px-4 py-2 rounded text-white text-center',
+      sectionClasses: 'px-3',
+    },
+  },
+  {
+    id: 'image',
+    title: 'Image',
+    icon: <IoImageOutline />,
+  },
+  {
+    id: 'textEditor',
+    title: 'Text Editor',
+    icon: <BsTextLeft />,
+  },
+  {
+    id: 'video',
+    title: 'Video',
+    icon: <RxVideo />,
+  },
 ];
 
+const queryAttr = 'data-rfd-draggable-id';
+
 const Editor: React.FC = () => {
-  const [droppedElements, setDroppedElements] = useState<Element[]>([]);
+  const [droppedElements, setDroppedElements] = useState<DropedElement[]>([]);
   const [placeholderProps, setPlaceholderProps] = useState<any>({});
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [selectedElementId, setSelectedElementId] = useState<string>('');
@@ -38,9 +86,16 @@ const Editor: React.FC = () => {
     if (!result.destination) return;
 
     if (result.source.droppableId === 'items') {
-      const newElement: any = {
-        id: `${result.draggableId}-${Date.now()}`,
+      const element: Element = initialElements.find(
+        (el) => el.id === result.draggableId
+      ) as Element;
+
+      const newElement: DropedElement = {
+        id: uuid(),
+        elementId: result.draggableId,
+        data: element.defaultData || {},
       };
+
       const updatedElements = [...droppedElements];
       updatedElements.splice(result.destination.index, 0, newElement);
       setDroppedElements(updatedElements);
@@ -53,12 +108,11 @@ const Editor: React.FC = () => {
     }
   };
 
-  const queryAttr = 'data-rfd-draggable-id';
   const onDragUpdate = (update: any) => {
     setSelectedElementId(update.draggableId);
     setIsDragging(true);
 
-    if (!update.destination) {
+    if (!update.destination || update.source.droppableId === 'items') {
       return;
     }
     const draggableId = update.draggableId;
@@ -96,12 +150,18 @@ const Editor: React.FC = () => {
     });
   };
 
-  const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
-    userSelect: 'none',
-    padding: '1rem',
-    margin: '0 0 1px 0',
-    ...draggableStyle,
-  });
+  const getItemStyle = (isDragging: boolean, draggableStyle: any) => {
+    return {
+      userSelect: 'none',
+      padding: '1rem',
+      margin: '0 0 1px 0',
+      ...draggableStyle,
+    };
+  };
+
+  useEffect(() => {
+    console.log('droppedElements', droppedElements);
+  }, [droppedElements]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
@@ -192,7 +252,7 @@ const Editor: React.FC = () => {
                                 false,
                                 provided.draggableProps.style
                               )}
-                              className='!p-0'
+                              className='!p-0 frame-elements'
                             >
                               <DragHandle
                                 id={element.id}
@@ -206,12 +266,7 @@ const Editor: React.FC = () => {
                                   console.log('deleted elementId', elementId)
                                 }
                               >
-                                <div className='p-4 flex flex-col items-center gap-2'>
-                                  <CiText size={30} />
-                                  <p className='text-xs'>
-                                    Heading {element.id}
-                                  </p>
-                                </div>
+                                <OutputElement element={element} />
                               </DragHandle>
                             </div>
                           )}
