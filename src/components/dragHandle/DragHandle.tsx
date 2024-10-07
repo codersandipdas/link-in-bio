@@ -1,33 +1,34 @@
+import { DroppedElement } from '@/utils/types';
 import React from 'react';
 import { MdOutlineClose, MdOutlineDragIndicator } from 'react-icons/md';
 
 interface Props {
   dragHandleProps: any;
-  id: string;
   selectedElementId: string;
+  element: DroppedElement;
   isDragging: boolean;
   children: React.ReactElement;
-  onSelect: (selectedElementId: string) => void;
+  onSelect: (selectedElement: DroppedElement) => void;
   onDelete: (selectedElementId: string) => void;
 }
 
 const DragHandle = ({
   dragHandleProps,
-  id,
   selectedElementId,
+  element,
   isDragging,
   children,
   onSelect,
   onDelete,
 }: Props) => {
-  const isSelected = id === selectedElementId;
+  const isSelected = element.id === selectedElementId;
 
   const handleSelect = () => {
-    onSelect(id);
+    onSelect(element);
   };
 
   const handleDelete = () => {
-    onDelete(id);
+    onDelete(element.id);
   };
 
   return (

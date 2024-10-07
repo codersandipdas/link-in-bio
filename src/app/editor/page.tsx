@@ -10,49 +10,61 @@ import { PiCursorClick } from 'react-icons/pi';
 import { IoImageOutline } from 'react-icons/io5';
 import { BsTextLeft } from 'react-icons/bs';
 import { RxVideo } from 'react-icons/rx';
-import { DropedElement } from '@/utils/types';
+import { DroppedElement, Element } from '@/utils/types';
 import OutputElement from '@/components/outputElement/OutputElement';
-
-interface Element {
-  id: string;
-  title: string;
-  icon: React.ReactElement;
-  defaultData?: any;
-}
+import RightSidebar from '@/components/editor/RightSidebar';
 
 const initialElements: Element[] = [
   {
     id: 'heading',
     title: 'Heading',
     icon: <CiText />,
-    defaultData: {
-      value: 'Enter your heading here Enter your heading here',
-      style: {},
-      classes: 'text-xl',
-      sectionClasses: '',
-    },
+    elements: [
+      {
+        id: 'heading',
+        type: 'text',
+        placeholder: 'Enter heading',
+        label: 'Heading',
+        value: 'Enter your heading here Enter your heading here',
+      },
+      {
+        id: 'link',
+        type: 'link',
+        placeholder: 'Paste URL or type',
+        label: 'Link',
+        value: '',
+      },
+    ],
+    secClasses: 'px-3',
+    elClasses: 'text-xl',
   },
   {
     id: 'socials',
     title: 'Socials',
     icon: <TbSocial />,
-    defaultData: {
-      value: [],
-      style: {},
-      classes: 'text-xl',
-      sectionClasses: 'px-3',
-    },
   },
   {
     id: 'button',
     title: 'Button',
     icon: <PiCursorClick />,
-    defaultData: {
-      value: 'Button Text',
-      style: {},
-      classes: 'text-sm bg-primary px-4 py-2 rounded text-white text-center',
-      sectionClasses: 'px-3',
-    },
+    elements: [
+      {
+        id: 'btn_text',
+        type: 'text',
+        placeholder: 'Enter heading',
+        label: 'Text',
+        value: 'Button Text',
+      },
+      {
+        id: 'link',
+        type: 'link',
+        placeholder: 'Paste URL or type',
+        label: 'Link',
+        value: '',
+      },
+    ],
+    secClasses: 'px-3',
+    elClasses: 'text-sm bg-primary px-4 py-2 rounded text-white text-center',
   },
   {
     id: 'image',
@@ -74,10 +86,13 @@ const initialElements: Element[] = [
 const queryAttr = 'data-rfd-draggable-id';
 
 const Editor: React.FC = () => {
-  const [droppedElements, setDroppedElements] = useState<DropedElement[]>([]);
+  const [droppedElements, setDroppedElements] = useState<DroppedElement[]>([]);
   const [placeholderProps, setPlaceholderProps] = useState<any>({});
   const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [selectedElementId, setSelectedElementId] = useState<string>('');
+  const [selectedElement, setSelectedElement] = useState<DroppedElement | null>(
+    null
+  );
+  const [selectedWidget, setSelectedWidget] = useState<Element | null>(null);
 
   const onDragEnd = (result: any) => {
     setPlaceholderProps({});
@@ -90,16 +105,18 @@ const Editor: React.FC = () => {
         (el) => el.id === result.draggableId
       ) as Element;
 
-      const newElement: DropedElement = {
+      const newElement: DroppedElement = {
         id: uuid(),
-        elementId: result.draggableId,
-        data: element.defaultData || {},
+        elType: result.draggableId,
+        elements: element.elements || [],
+        secClasses: element.secClasses || '',
+        elClasses: element.elClasses || '',
       };
 
       const updatedElements = [...droppedElements];
       updatedElements.splice(result.destination.index, 0, newElement);
       setDroppedElements(updatedElements);
-      setSelectedElementId(newElement.id);
+      setSelectedElement(newElement);
     } else {
       const reorderedElements = [...droppedElements];
       const [movedElement] = reorderedElements.splice(result.source.index, 1);
@@ -109,7 +126,11 @@ const Editor: React.FC = () => {
   };
 
   const onDragUpdate = (update: any) => {
-    setSelectedElementId(update.draggableId);
+    const element: DroppedElement = droppedElements.find(
+      (el) => el.id === update.draggableId
+    ) as DroppedElement;
+    setSelectedElement(element);
+
     setIsDragging(true);
 
     if (!update.destination || update.source.droppableId === 'items') {
@@ -160,8 +181,10 @@ const Editor: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log('droppedElements', droppedElements);
-  }, [droppedElements]);
+    const editorEl =
+      initialElements.find((el) => el.id === selectedElement?.elType) || null;
+    setSelectedWidget(editorEl);
+  }, [selectedElement]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
@@ -255,15 +278,17 @@ const Editor: React.FC = () => {
                               className='!p-0 frame-elements'
                             >
                               <DragHandle
-                                id={element.id}
                                 dragHandleProps={provided.dragHandleProps}
-                                selectedElementId={selectedElementId}
-                                isDragging={isDragging}
-                                onSelect={(elementId) =>
-                                  setSelectedElementId(elementId)
+                                selectedElementId={
+                                  selectedElement?.id as string
                                 }
-                                onDelete={(elementId) =>
-                                  console.log('deleted elementId', elementId)
+                                element={element}
+                                isDragging={isDragging}
+                                onSelect={(element) =>
+                                  setSelectedElement(element)
+                                }
+                                onDelete={(elType) =>
+                                  console.log('deleted elType', elType)
                                 }
                               >
                                 <OutputElement element={element} />
@@ -291,8 +316,8 @@ const Editor: React.FC = () => {
             </div>
           </div>
 
-          <aside className='shrink-0 p-4 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
-            Right sidebar
+          <aside className='shrink-0 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
+            <RightSidebar widget={selectedWidget} element={selectedElement} />
           </aside>
         </main>
       </div>

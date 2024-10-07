@@ -1,22 +1,25 @@
 import React from 'react';
-import { DropedElement } from '@/utils/types';
+import { DroppedElement } from '@/utils/types';
+import clsx from 'clsx';
 
 type Props = {
-  element: DropedElement;
+  element: DroppedElement;
 };
 
 const OutputElement: React.FC<Props> = ({ element }) => {
-  switch (element.elementId) {
+  switch (element.elType) {
     case 'heading':
       return (
-        <h2 className={element.data.classes || ''}>{element.data.value}</h2>
+        <h2 className={clsx(element.elClasses || '', element.secClasses || '')}>
+          {element?.elements?.[0]?.value}
+        </h2>
       );
 
     case 'button':
       return (
-        <div className={element.data.sectionClasses || ''}>
-          <button className={element.data.classes || ''}>
-            {element.data.value}
+        <div className={element.secClasses || ''}>
+          <button className={element.elClasses || ''}>
+            {element?.elements?.[0]?.value || 'Button Text'}
           </button>
         </div>
       );
