@@ -20,7 +20,7 @@ const Text: React.FC<Props> = ({ placeholder, data, onChange }) => {
     <textarea
       placeholder={placeholder}
       rows={4}
-      className='px-2 py-1.5 rounded border border-white/15 bg-transparent focus:border-white/50 focus:outline-none'
+      className='textarea-input'
       value={val}
       onChange={handleChange}
     />
