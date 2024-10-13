@@ -41,12 +41,6 @@ const initialElements: Element[] = [
     elClasses: 'text-xl',
   },
   {
-    id: 'socials',
-    title: 'Socials',
-    icon: <TbSocial />,
-    controls: [],
-  },
-  {
     id: 'button',
     title: 'Button',
     icon: <PiCursorClick />,
@@ -63,7 +57,7 @@ const initialElements: Element[] = [
         type: controlType.LINK,
         placeholder: 'Paste URL or type',
         label: 'Link',
-        defaultValue: '',
+        defaultValue: { link: '', openInNew: true },
       },
     ],
     secClasses: 'px-3',
@@ -73,6 +67,12 @@ const initialElements: Element[] = [
     id: 'image',
     title: 'Image',
     icon: <IoImageOutline />,
+    controls: [],
+  },
+  {
+    id: 'socials',
+    title: 'Socials',
+    icon: <TbSocial />,
     controls: [],
   },
   {
@@ -190,6 +190,20 @@ const Editor: React.FC = () => {
       margin: '0 0 1px 0',
       ...draggableStyle,
     };
+  };
+
+  const handleDataChange = (changedId: string, data: any) => {
+    try {
+      const newData = [...droppedElements];
+
+      const index = newData.findIndex((el) => el.id === selectedElement?.id);
+      if (index < 0) return;
+
+      newData[index].data[changedId] = data;
+      setDroppedElements(newData);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   useEffect(() => {
@@ -348,7 +362,13 @@ const Editor: React.FC = () => {
           </div>
 
           <aside className='shrink-0 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
-            <RightSidebar widget={selectedWidget} element={selectedElement} />
+            <RightSidebar
+              widget={selectedWidget}
+              element={selectedElement}
+              onDataChange={(changedId, data) =>
+                handleDataChange(changedId, data)
+              }
+            />
           </aside>
         </main>
       </div>

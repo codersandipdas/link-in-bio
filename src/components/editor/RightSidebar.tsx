@@ -7,9 +7,10 @@ import { controlType } from '@/utils/enums';
 type Props = {
   element: DroppedElement | null;
   widget: Element | null;
+  onDataChange: (changedId: string, data: any) => void;
 };
 
-const RightSidebar: React.FC<Props> = ({ element, widget }) => {
+const RightSidebar: React.FC<Props> = ({ element, widget, onDataChange }) => {
   const getElement = (control: any, data: any) => {
     switch (control.type) {
       case controlType.TEXT:
@@ -17,7 +18,7 @@ const RightSidebar: React.FC<Props> = ({ element, widget }) => {
           <Text
             placeholder={control.placeholder || ''}
             data={data[control.id]}
-            onChange={(data) => console.log('data', data)}
+            onChange={(data) => onDataChange(control.id, data)}
           />
         );
 
