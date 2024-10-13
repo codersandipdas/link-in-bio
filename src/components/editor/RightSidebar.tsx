@@ -1,6 +1,7 @@
 import { DroppedElement, Element } from '@/utils/types';
 import React from 'react';
-import LinkInput from './LinkInput';
+import Text from '@/controls/Text';
+import Link from '@/controls/Link';
 
 type Props = {
   element: DroppedElement | null;
@@ -9,21 +10,19 @@ type Props = {
 
 const RightSidebar: React.FC<Props> = ({ element, widget }) => {
   const getElement = (el: any) => {
-    if (el.type === 'text') {
-      return (
-        <textarea
-          placeholder={el.placeholder}
-          rows={4}
-          className='px-2 py-1.5 rounded border border-white/15 bg-transparent focus:border-white/50 focus:outline-none'
-        />
-      );
-    }
+    switch (el.type) {
+      case 'text':
+        return <Text placeholder={el.placeholder || ''} />;
 
-    if (el.type === 'link') {
-      return <LinkInput />;
-    }
+      case 'link':
+        return <Link />;
 
-    return <div></div>;
+      case 'image':
+        return <Link />;
+
+      default:
+        return <div></div>;
+    }
   };
 
   return (

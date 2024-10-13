@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { IoIosSettings } from 'react-icons/io';
 
-const LinkInput = () => {
+const Link = () => {
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const handleToggleShowSettings = () => {
@@ -37,4 +37,4 @@ const LinkInput = () => {
   );
 };
 
-export default LinkInput;
+export default Link;
