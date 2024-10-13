@@ -1,6 +1,5 @@
 import React from 'react';
 import { DroppedElement } from '@/utils/types';
-import clsx from 'clsx';
 import Heading from '@/outputs/Heading';
 import Button from '@/outputs/Button';
 
