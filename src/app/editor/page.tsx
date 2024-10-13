@@ -13,6 +13,7 @@ import { RxVideo } from 'react-icons/rx';
 import { DroppedElement, Element } from '@/utils/types';
 import OutputElement from '@/components/outputElement/OutputElement';
 import RightSidebar from '@/components/editor/RightSidebar';
+import Image from 'next/image';
 
 const initialElements: Element[] = [
   {
@@ -252,7 +253,14 @@ const Editor: React.FC = () => {
           <div className='flex-1 p-4 flex items-center justify-center text-black overflow-hidden'>
             <div className='h-full bg-white aspect-[9/19] iphone-case'>
               <div className='flex flex-col h-full overflow-hidden bg-white rounded-3xl'>
-                <div className='h-[30px] shrink-0'></div>
+                <Image
+                  src='/assets/images/statusbar.png'
+                  alt='statusbar'
+                  quality={100}
+                  width={400}
+                  height={20}
+                  className='w-full select-none'
+                />
                 <Droppable droppableId='elements'>
                   {(provided) => (
                     <div
@@ -297,7 +305,19 @@ const Editor: React.FC = () => {
                           )}
                         </Draggable>
                       ))}
+
                       {provided.placeholder}
+
+                      {droppedElements.length === 0 && !isDragging ? (
+                        <div className='h-full flex flex-col p-4 justify-center items-center'>
+                          <p className='text-base text-slate-400'>
+                            Drop elements here!
+                          </p>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+
                       <div
                         id='custom-placeholder'
                         style={{
