@@ -43,15 +43,12 @@ const Link: React.FC<Props> = ({ placeholder, data, onChange }) => {
         <input
           type='url'
           placeholder={placeholder}
-          className='flex-1 px-2 py-1.5 rounded-l border border-white/15 bg-transparent focus:border-white/50 focus:outline-none'
+          className='text-input'
           value={val.link}
           onChange={handleLinkChange}
         />
 
-        <button
-          onClick={handleToggleShowSettings}
-          className='shrink-0 border border-l-0 border-white/15 px-2 flex items-center justify-center rounded-r bg-transparent hover:bg-white/15'
-        >
+        <button onClick={handleToggleShowSettings} className='settings-icon'>
           <IoIosSettings />
         </button>
       </div>
