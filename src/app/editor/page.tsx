@@ -13,73 +13,80 @@ import { RxVideo } from 'react-icons/rx';
 import { DroppedElement, Element } from '@/utils/types';
 import OutputElement from '@/components/outputElement/OutputElement';
 import RightSidebar from '@/components/editor/RightSidebar';
+import Image from 'next/image';
+import { controlType } from '@/utils/enums';
 
 const initialElements: Element[] = [
   {
     id: 'heading',
     title: 'Heading',
     icon: <CiText />,
-    elements: [
+    controls: [
       {
         id: 'heading',
-        type: 'text',
+        type: controlType.TEXT,
         placeholder: 'Enter heading',
         label: 'Heading',
-        value: 'Enter your heading here Enter your heading here',
+        defaultValue: 'Type your heading here',
       },
       {
         id: 'link',
-        type: 'link',
+        type: controlType.LINK,
         placeholder: 'Paste URL or type',
         label: 'Link',
-        value: '',
+        defaultValue: { link: '', openInNew: true },
       },
     ],
     secClasses: 'px-3',
     elClasses: 'text-xl',
   },
   {
-    id: 'socials',
-    title: 'Socials',
-    icon: <TbSocial />,
-  },
-  {
     id: 'button',
     title: 'Button',
     icon: <PiCursorClick />,
-    elements: [
+    controls: [
       {
         id: 'btn_text',
-        type: 'text',
+        type: controlType.TEXT,
         placeholder: 'Enter heading',
         label: 'Text',
-        value: 'Button Text',
+        defaultValue: 'Button Text',
       },
       {
-        id: 'link',
-        type: 'link',
+        id: 'btn_link',
+        type: controlType.LINK,
         placeholder: 'Paste URL or type',
         label: 'Link',
-        value: '',
+        defaultValue: { link: '#', openInNew: true },
       },
     ],
     secClasses: 'px-3',
-    elClasses: 'text-sm bg-primary px-4 py-2 rounded text-white text-center',
+    elClasses:
+      'text-sm bg-primary px-4 py-2.5 rounded text-white text-center inline-block w-full text-center',
   },
   {
     id: 'image',
     title: 'Image',
     icon: <IoImageOutline />,
+    controls: [],
+  },
+  {
+    id: 'socials',
+    title: 'Socials',
+    icon: <TbSocial />,
+    controls: [],
   },
   {
     id: 'textEditor',
     title: 'Text Editor',
     icon: <BsTextLeft />,
+    controls: [],
   },
   {
     id: 'video',
     title: 'Video',
     icon: <RxVideo />,
+    controls: [],
   },
 ];
 
@@ -105,12 +112,18 @@ const Editor: React.FC = () => {
         (el) => el.id === result.draggableId
       ) as Element;
 
+      const data: any = {};
+      for (const control of element?.controls || []) {
+        data[control.id] = control.defaultValue;
+      }
+
       const newElement: DroppedElement = {
         id: uuid(),
         elType: result.draggableId,
-        elements: element.elements || [],
+        controls: element.controls || [],
         secClasses: element.secClasses || '',
         elClasses: element.elClasses || '',
+        data: data || {},
       };
 
       const updatedElements = [...droppedElements];
@@ -178,6 +191,20 @@ const Editor: React.FC = () => {
       margin: '0 0 1px 0',
       ...draggableStyle,
     };
+  };
+
+  const handleDataChange = (changedId: string, data: any) => {
+    try {
+      const newData = [...droppedElements];
+
+      const index = newData.findIndex((el) => el.id === selectedElement?.id);
+      if (index < 0) return;
+
+      newData[index].data[changedId] = data;
+      setDroppedElements(newData);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   useEffect(() => {
@@ -252,7 +279,14 @@ const Editor: React.FC = () => {
           <div className='flex-1 p-4 flex items-center justify-center text-black overflow-hidden'>
             <div className='h-full bg-white aspect-[9/19] iphone-case'>
               <div className='flex flex-col h-full overflow-hidden bg-white rounded-3xl'>
-                <div className='h-[30px] shrink-0'></div>
+                <Image
+                  src='/assets/images/statusbar.png'
+                  alt='statusbar'
+                  quality={100}
+                  width={400}
+                  height={20}
+                  className='w-full select-none'
+                />
                 <Droppable droppableId='elements'>
                   {(provided) => (
                     <div
@@ -297,7 +331,19 @@ const Editor: React.FC = () => {
                           )}
                         </Draggable>
                       ))}
+
                       {provided.placeholder}
+
+                      {droppedElements.length === 0 && !isDragging ? (
+                        <div className='h-full flex flex-col p-4 justify-center items-center'>
+                          <p className='text-base text-slate-400'>
+                            Drop elements here!
+                          </p>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+
                       <div
                         id='custom-placeholder'
                         style={{
@@ -317,7 +363,13 @@ const Editor: React.FC = () => {
           </div>
 
           <aside className='shrink-0 w-[300px] border-l border-slate-800 bg-[#1f2124]'>
-            <RightSidebar widget={selectedWidget} element={selectedElement} />
+            <RightSidebar
+              widget={selectedWidget}
+              element={selectedElement}
+              onDataChange={(changedId, data) =>
+                handleDataChange(changedId, data)
+              }
+            />
           </aside>
         </main>
       </div>

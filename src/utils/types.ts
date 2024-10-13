@@ -1,8 +1,18 @@
+import { controlType } from './enums';
+
+export type Controls = {
+  id: string;
+  type: controlType;
+  placeholder?: string;
+  label: string;
+  defaultValue: any;
+};
+
 export type Element = {
   id: string;
   title: string;
   icon: React.ReactElement;
-  elements?: Array<any>;
+  controls: Controls[];
   secClasses?: string;
   elClasses?: string;
 };
@@ -10,7 +20,8 @@ export type Element = {
 export type DroppedElement = {
   id: string;
   elType: string;
-  elements: any;
+  controls: Controls[];
+  data: any;
   secClasses: string;
   elClasses: string;
 };

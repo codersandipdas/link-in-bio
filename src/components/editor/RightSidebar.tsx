@@ -1,29 +1,48 @@
 import { DroppedElement, Element } from '@/utils/types';
 import React from 'react';
-import LinkInput from './LinkInput';
+import Text from '@/controls/Text';
+import Link from '@/controls/Link';
+import { controlType } from '@/utils/enums';
 
 type Props = {
   element: DroppedElement | null;
   widget: Element | null;
+  onDataChange: (changedId: string, data: any) => void;
 };
 
-const RightSidebar: React.FC<Props> = ({ element, widget }) => {
-  const getElement = (el: any) => {
-    if (el.type === 'text') {
-      return (
-        <textarea
-          placeholder={el.placeholder}
-          rows={4}
-          className='px-2 py-1.5 rounded border border-white/15 bg-transparent focus:border-white/50 focus:outline-none'
-        />
-      );
-    }
+const RightSidebar: React.FC<Props> = ({ element, widget, onDataChange }) => {
+  const getElement = (control: any, data: any) => {
+    switch (control.type) {
+      case controlType.TEXT:
+        return (
+          <Text
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => onDataChange(control.id, data)}
+          />
+        );
 
-    if (el.type === 'link') {
-      return <LinkInput />;
-    }
+      case controlType.LINK:
+        return (
+          <Link
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => onDataChange(control.id, data)}
+          />
+        );
 
-    return <div></div>;
+      case controlType.IMAGE:
+        return (
+          <Link
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => onDataChange(control.id, data)}
+          />
+        );
+
+      default:
+        return <div></div>;
+    }
   };
 
   return (
@@ -33,13 +52,13 @@ const RightSidebar: React.FC<Props> = ({ element, widget }) => {
       </div>
 
       <div className='flex-1 flex flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 py-4'>
-        {element?.elements?.map((el: any) => (
+        {element?.controls?.map((control: any) => (
           <div
             className='flex flex-col gap-2 text-xs'
-            key={element.id + '_' + el.id}
+            key={element.id + '_' + control.id}
           >
-            <label>{el.label}</label>
-            {getElement(el)}
+            <label>{control.label}</label>
+            {getElement(control, element.data)}
           </div>
         ))}
       </div>
