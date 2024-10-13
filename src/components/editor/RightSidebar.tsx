@@ -27,7 +27,7 @@ const RightSidebar: React.FC<Props> = ({ element, widget, onDataChange }) => {
           <Link
             placeholder={control.placeholder || ''}
             data={data[control.id]}
-            onChange={(data) => console.log('data', data)}
+            onChange={(data) => onDataChange(control.id, data)}
           />
         );
 
@@ -36,7 +36,7 @@ const RightSidebar: React.FC<Props> = ({ element, widget, onDataChange }) => {
           <Link
             placeholder={control.placeholder || ''}
             data={data[control.id]}
-            onChange={(data) => console.log('data', data)}
+            onChange={(data) => onDataChange(control.id, data)}
           />
         );
 
