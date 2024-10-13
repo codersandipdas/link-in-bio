@@ -2,6 +2,7 @@ import { DroppedElement, Element } from '@/utils/types';
 import React from 'react';
 import Text from '@/controls/Text';
 import Link from '@/controls/Link';
+import { controlType } from '@/utils/enums';
 
 type Props = {
   element: DroppedElement | null;
@@ -9,16 +10,34 @@ type Props = {
 };
 
 const RightSidebar: React.FC<Props> = ({ element, widget }) => {
-  const getElement = (el: any) => {
-    switch (el.type) {
-      case 'text':
-        return <Text placeholder={el.placeholder || ''} />;
+  const getElement = (control: any, data: any) => {
+    switch (control.type) {
+      case controlType.TEXT:
+        return (
+          <Text
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => console.log('data', data)}
+          />
+        );
 
-      case 'link':
-        return <Link />;
+      case controlType.LINK:
+        return (
+          <Link
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => console.log('data', data)}
+          />
+        );
 
-      case 'image':
-        return <Link />;
+      case controlType.IMAGE:
+        return (
+          <Link
+            placeholder={control.placeholder || ''}
+            data={data[control.id]}
+            onChange={(data) => console.log('data', data)}
+          />
+        );
 
       default:
         return <div></div>;
@@ -32,13 +51,13 @@ const RightSidebar: React.FC<Props> = ({ element, widget }) => {
       </div>
 
       <div className='flex-1 flex flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 py-4'>
-        {element?.elements?.map((el: any) => (
+        {element?.controls?.map((control: any) => (
           <div
             className='flex flex-col gap-2 text-xs'
-            key={element.id + '_' + el.id}
+            key={element.id + '_' + control.id}
           >
-            <label>{el.label}</label>
-            {getElement(el)}
+            <label>{control.label}</label>
+            {getElement(control, element.data)}
           </div>
         ))}
       </div>

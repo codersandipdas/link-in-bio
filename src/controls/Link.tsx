@@ -1,22 +1,51 @@
 'use client';
 
-import React, { useState } from 'react';
+type Data = {
+  link: string;
+  openInNew: boolean;
+};
+
+type Props = {
+  placeholder: string;
+  data: Data;
+  onChange: (data: Data) => void;
+};
+
+import React, { useEffect, useState } from 'react';
 import { IoIosSettings } from 'react-icons/io';
 
-const Link = () => {
+const Link: React.FC<Props> = ({ placeholder, data, onChange }) => {
+  const [val, setVal] = useState<Data>(data);
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
   const handleToggleShowSettings = () => {
     setShowSettings((prev) => !prev);
   };
 
+  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVal((prev) => ({ ...prev, link: e.target.value }));
+  };
+
+  const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVal((prev) => ({
+      ...prev,
+      openInNew: e.target.checked,
+    }));
+  };
+
+  useEffect(() => {
+    onChange(val);
+  }, [val]);
+
   return (
     <>
       <div className='flex'>
         <input
           type='url'
-          placeholder='Paste URL or type'
+          placeholder={placeholder}
           className='flex-1 px-2 py-1.5 rounded-l border border-white/15 bg-transparent focus:border-white/50 focus:outline-none'
+          value={val.link}
+          onChange={handleLinkChange}
         />
 
         <button
@@ -29,7 +58,14 @@ const Link = () => {
 
       {showSettings && (
         <div className='flex items-center gap-2'>
-          <input type='checkbox' id='openinnew' name='vehicle1' value='Bike' />
+          <input
+            type='checkbox'
+            id='openinnew'
+            name='openinnew'
+            value='yes'
+            checked={val.openInNew || false}
+            onChange={handleTargetChange}
+          />
           <label htmlFor='openinnew'>Open in new window</label>
         </div>
       )}

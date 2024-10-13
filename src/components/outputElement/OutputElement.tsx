@@ -11,7 +11,7 @@ const OutputElement: React.FC<Props> = ({ element }) => {
     case 'heading':
       return (
         <h2 className={clsx(element.elClasses || '', element.secClasses || '')}>
-          {element?.elements?.[0]?.value}
+          {element?.controls?.[0]?.defaultValue}
         </h2>
       );
 
@@ -19,7 +19,7 @@ const OutputElement: React.FC<Props> = ({ element }) => {
       return (
         <div className={element.secClasses || ''}>
           <button className={element.elClasses || ''}>
-            {element?.elements?.[0]?.value || 'Button Text'}
+            {element?.controls?.[0]?.defaultValue || 'Button Text'}
           </button>
         </div>
       );

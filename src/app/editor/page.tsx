@@ -14,26 +14,27 @@ import { DroppedElement, Element } from '@/utils/types';
 import OutputElement from '@/components/outputElement/OutputElement';
 import RightSidebar from '@/components/editor/RightSidebar';
 import Image from 'next/image';
+import { controlType } from '@/utils/enums';
 
 const initialElements: Element[] = [
   {
     id: 'heading',
     title: 'Heading',
     icon: <CiText />,
-    elements: [
+    controls: [
       {
         id: 'heading',
-        type: 'text',
+        type: controlType.TEXT,
         placeholder: 'Enter heading',
         label: 'Heading',
-        value: 'Enter your heading here Enter your heading here',
+        defaultValue: 'Type your heading here',
       },
       {
         id: 'link',
-        type: 'link',
+        type: controlType.LINK,
         placeholder: 'Paste URL or type',
         label: 'Link',
-        value: '',
+        defaultValue: { link: '', openInNew: true },
       },
     ],
     secClasses: 'px-3',
@@ -43,25 +44,26 @@ const initialElements: Element[] = [
     id: 'socials',
     title: 'Socials',
     icon: <TbSocial />,
+    controls: [],
   },
   {
     id: 'button',
     title: 'Button',
     icon: <PiCursorClick />,
-    elements: [
+    controls: [
       {
         id: 'btn_text',
-        type: 'text',
+        type: controlType.TEXT,
         placeholder: 'Enter heading',
         label: 'Text',
-        value: 'Button Text',
+        defaultValue: 'Button Text',
       },
       {
         id: 'link',
-        type: 'link',
+        type: controlType.LINK,
         placeholder: 'Paste URL or type',
         label: 'Link',
-        value: '',
+        defaultValue: '',
       },
     ],
     secClasses: 'px-3',
@@ -71,16 +73,19 @@ const initialElements: Element[] = [
     id: 'image',
     title: 'Image',
     icon: <IoImageOutline />,
+    controls: [],
   },
   {
     id: 'textEditor',
     title: 'Text Editor',
     icon: <BsTextLeft />,
+    controls: [],
   },
   {
     id: 'video',
     title: 'Video',
     icon: <RxVideo />,
+    controls: [],
   },
 ];
 
@@ -106,12 +111,18 @@ const Editor: React.FC = () => {
         (el) => el.id === result.draggableId
       ) as Element;
 
+      const data: any = {};
+      for (const control of element?.controls || []) {
+        data[control.id] = control.defaultValue;
+      }
+
       const newElement: DroppedElement = {
         id: uuid(),
         elType: result.draggableId,
-        elements: element.elements || [],
+        controls: element.controls || [],
         secClasses: element.secClasses || '',
         elClasses: element.elClasses || '',
+        data: data || {},
       };
 
       const updatedElements = [...droppedElements];
