@@ -37,7 +37,7 @@ const initialElements: Element[] = [
         defaultValue: { link: '', openInNew: true },
       },
     ],
-    secClasses: 'px-3',
+    secClasses: 'px-2',
     elClasses: 'text-xl',
   },
   {
@@ -60,7 +60,7 @@ const initialElements: Element[] = [
         defaultValue: { link: '#', openInNew: true },
       },
     ],
-    secClasses: 'px-3',
+    secClasses: 'px-2',
     elClasses:
       'text-sm bg-primary px-4 py-2.5 rounded text-white text-center inline-block w-full text-center',
   },

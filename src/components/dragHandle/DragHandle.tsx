@@ -33,28 +33,25 @@ const DragHandle = ({
 
   return (
     <div
-      className={`relative transition-all !p-0 group  ${
+      className={`relative transition-all !p-1 group min-h-[20px] ${
         isSelected ? '!bg-white' : ''
       }`}
       onClick={handleSelect}
     >
       <div
-        className={`hidden absolute top-0 left-1/2 w-[60px] h-[20px] bg-dark-accent translate-x-[-50%] text-white px-2 ${
+        className={`hidden absolute top-0 right-0 w-auto h-[20px] px-1 bg-dark-accent text-white rounded-bl-md ${
           isSelected ? '!flex' : ''
         } ${!isDragging ? 'group-hover:!flex' : ''}`}
-        style={{
-          clipPath: 'polygon(0 0, 100% 0, 86% 99%, 16% 100%)',
-        }}
       >
         <button
           {...dragHandleProps}
-          className='flex-1 flex items-center justify-center'
+          className='flex-1 flex items-center justify-center px-1'
           onClick={handleSelect}
         >
           <MdOutlineDragIndicator className='rotate-90' />
         </button>
         <button
-          className='flex-1 flex items-center justify-center text-sm'
+          className='flex-1 flex items-center justify-center text-sm px-1'
           onClick={handleDelete}
         >
           <MdOutlineClose />
